@@ -8,6 +8,7 @@ from datetime import datetime
 from brand24_login import login_to_brand24
 import time
 
+
 def select_dropdown_option_by_text(driver, element_id, text):
     try:
         dropdown = Select(driver.find_element(By.ID, element_id))
@@ -20,7 +21,7 @@ def select_dropdown_option_by_text(driver, element_id, text):
 def fill_field_by_id(driver, field_id, text):
     try:
         field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, field_id)))
-        field.send_keys(text)
+        driver.execute_script(f"arguments[0].value = `{text}`;", field)
     except TimeoutException:
         print(f"Field with ID '{field_id}' not clickable.")
     except Exception as e:
@@ -51,28 +52,29 @@ def click_submit_button(driver):
 
 # Login to the website
 driver = login_to_brand24(username="username", password="password")
-data = pd.read_csv("C:/Users/pozar/Desktop/W/B24_test_IG.csv")
+data = pd.read_csv("C:/Users/pozar/Desktop/W/kupka.csv", encoding='utf-8')
 
 for index, row in data.iterrows():
-    fill_field_by_id(driver, "mention_url", row['Entry address'])
+    fill_field_by_id(driver, "mention_url", row['url'])
     select_dropdown_option_by_text(driver, 'mention_category', 'Instagram')
     select_dropdown_option_by_text(driver, 'mention_country', 'RO')
-    fill_field_by_id(driver, "mention_title", row['Entry title'])
-    fill_field_by_id(driver, "mention_content", row['Mention content'])
-    fill_field_by_id(driver, "mention_likes", str(row['Likes']))
-    fill_field_by_id(driver, "mention_views", str(row['Pageviews']))
-    fill_field_by_id(driver, "mention_comments", str(row['Comments']))
+    select_dropdown_option_by_text(driver, 'mention_sentiment', 'Positive')
+    fill_field_by_id(driver, "mention_title", row['ownerFullName'])
+    fill_field_by_id(driver, "mention_content", row['caption'])
+    fill_field_by_id(driver, "mention_likes", str(row['likesCount']))
+    #fill_field_by_id(driver, "mention_views", str(row['Pageviews']))
+    fill_field_by_id(driver, "mention_comments", str(row['commentsCount']))
 
     # Handle date conversion
     try:
-        date_obj = datetime.strptime(str(row['Date']), '%m/%d/%Y')
+        date_obj = datetime.strptime(str(row['timestamp']), '%Y-%m-%d')
         set_readonly_field(driver, "mention_created_date_day", date_obj.strftime('%d-%m-%Y'))
         set_readonly_field(driver, "mention_created_date_hour", "12")
         set_readonly_field(driver, "mention_created_date_minute", "00")
     except ValueError as ve:
-        print(f"Date parsing error on row {index} with value '{row['Date']}': {ve}")
+        print(f"Date parsing error on row {index} with value '{row['timestamp']}': {ve}")
         continue
-
+    time.sleep(1)
     click_submit_button(driver)
 
     # Checking for an error message indicating a duplicate entry
@@ -82,13 +84,13 @@ for index, row in data.iterrows():
                 (By.XPATH, "//p[contains(., 'There is the entry with this address in the project already')]"))
         )
         if "There is the entry with this address in the project already" in error_message.text:
-            print(f"Duplicate entry on row {index} with address: {row['Entry address']}")
+            print(f"Duplicate entry on row {index} with address: {row['url']}")
             continue  # Skip the rest of the loop and proceed with the next row
     except TimeoutException:
         # If no error message is found, assume the submission was successful
         pass
 
-        #small delay before continuing to the next iteration
+        #delay
         time.sleep(1)
 
     # Check for the end of the data
