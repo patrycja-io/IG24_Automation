@@ -52,7 +52,7 @@ def click_submit_button(driver):
 
 # Login to the website
 driver = login_to_brand24(username="username", password="password")
-data = pd.read_csv("C:/Users/pozar/Desktop/W/kupka.csv", encoding='utf-8')
+data = pd.read_csv("C:/Users/pozar/Desktop/W/B24_test.csv", encoding='utf-8')
 
 for index, row in data.iterrows():
     fill_field_by_id(driver, "mention_url", row['url'])
