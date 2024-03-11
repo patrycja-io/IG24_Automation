@@ -56,7 +56,9 @@ data = pd.read_csv("C:/Users/pozar/Desktop/W/B24_test.csv", encoding='utf-8')
 
 for index, row in data.iterrows():
     fill_field_by_id(driver, "mention_url", row['url'])
+    #Specify the platform from which you are adding mentions
     select_dropdown_option_by_text(driver, 'mention_category', 'Instagram')
+    #Specify the country from which the mentions are being added
     select_dropdown_option_by_text(driver, 'mention_country', 'RO')
     select_dropdown_option_by_text(driver, 'mention_sentiment', 'Positive')
     fill_field_by_id(driver, "mention_title", row['ownerFullName'])

@@ -3,7 +3,6 @@ from selenium.webdriver.common.by import By
 
 def login_to_brand24(username, password):
 
-
     driver = webdriver.Chrome()
 
     # Enter the URL for a specific mention form
@@ -13,8 +12,8 @@ def login_to_brand24(username, password):
     password_field = driver.find_element(By.ID, "password")
 
     # Enter the login credentials
-    login_field.send_keys("login")
-    password_field.send_keys("password")
+    login_field.send_keys("Franekoke1234@gmail.com")
+    password_field.send_keys("Franekok123!")
 
     login_button = driver.find_element(By.ID, "login_button")
     driver.execute_script("arguments[0].click();", login_button)
